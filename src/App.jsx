@@ -1,32 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import './App.css';
+
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { Footer } from './Footer.jsx';
+import { Header } from './Header.jsx';
+
+const firebaseConfig = {
+
+}
+
+const app = initializeApp(firebaseConfig)
+const fireStore = getFirestore(app)
+
+function ChatRoom() {
+  return (
+      <>
+        Hello
+      </>
+  );
+}
+
+function SignIn() {
+  return (
+      <>
+        <h2>Sign In</h2>
+        <form>
+          <label htmlFor="Name">Name</label>
+          <input type="text" placeholder="Name" required />
+          <label htmlFor="email">Email</label>
+          <input type="email" name="email" id="email" />
+          <label htmlFor="password">Password</label>
+          <input type="password" name="password" id="password" />
+          <button onClick={() => {}}>Sign In</button>
+        </form>
+      </>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+    let user = null;
 
-  return (
+    return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+      <Header />
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        {user ? <ChatRoom /> : <SignIn />}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Footer />
     </div>
   )
 }
