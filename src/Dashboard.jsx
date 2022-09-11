@@ -5,26 +5,39 @@
  */
 import { useState } from 'react';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { getFirestore, collection } from 'firebase/firestore';
+import {
+  getFirestore, collection, addDoc, query, limit
+} from 'firebase/firestore';
 
 export function Dashboard(props) {
-  const [user, setUser, app] = props;
+  const [user, setUser, app] = [props.user, props.setUser, props.app];
+  const [chatMessage, setChatMessage] = useState('');
+  
   const db = getFirestore(app);
   const messagesReference = collection(db, 'messages');
-  const [newMessage, setNewMessage] = useState('');
+  const chatsQuery = query(
+    messagesReference,
+    limit(10)
+  );
   const [messages] = useCollectionData(
-      messagesReference, { idField: 'id' });
+    chatsQuery, { idField: 'id' });
 
   async function sendMessage(e) {
     e.preventDefault();
-    const message = {
+    const newMessage = {
       name: user.name,
-      message: newMessage,
-      createdAt: new Date(), // treat timezones later
+      message: chatMessage
     };
-    await messagesReference.add(message);
+    
+    try {
+      console.log('Adding message to database...');
+      const entry = await addDoc(messagesReference, newMessage);
+      console.log("Document written with ID: ", entry.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
 
-    setNewMessage('');
+    setChatMessage('');
   }
 
   return (
@@ -48,6 +61,9 @@ export function Dashboard(props) {
         </div>
         <form onSubmit={sendMessage}>
           <label htmlFor="message">Message</label>
+          <input type="text" name="message" id="message"
+            value={chatMessage}
+            onChange={(e) => setChatMessage(e.target.value)}></input>
           <button type="submit">send</button>
         </form>
       </div>
